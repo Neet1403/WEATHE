@@ -1,0 +1,45 @@
+import sys
+import requests
+api_key = "c349ebec38dacfc8d5dc75b71cfeea08"
+
+# Base URL for the OpenWeatherMap API
+base_url = "http://api.openweathermap.org/data/2.5/weather?"
+
+# Get the city name from the command-line arguments or set a default value
+if len(sys.argv) > 1:
+    city_name = sys.argv[1]
+else:
+    city_name = input("Enter city name: ")
+
+# Complete URL to make the API request
+complete_url = f"{base_url}q={city_name}&appid={api_key}"
+
+try:
+    # Make the API request
+    response = requests.get(complete_url)
+
+    # Convert the JSON response to a Python dictionary
+    data = response.json()
+
+    # Process the data as needed (e.g., extracting temperature, pressure, etc.)
+    if data["cod"] == 200:  # A response with code 200 indicates success
+        # Extract relevant information from the data dictionary
+        main_data = data["main"]
+        temperature = main_data["temp"]
+        pressure = main_data["pressure"]
+        humidity = main_data["humidity"]
+        weather_data = data["weather"]
+        description = weather_data[0]["description"]
+
+        # Print the weather information
+        print(f"Temperature (in kelvin unit): {temperature}")
+        print(f"Atmospheric pressure (in hPa unit): {pressure}")
+        print(f"Humidity (in percentage): {humidity}")
+        print(f"Weather description: {description}")
+    else:
+        print("City Not Found")
+
+except requests.exceptions.RequestException as e:
+    print(f"Error: There was a problem with the API request: {e}")
+except ValueError:
+    print("Error: Unable to decode JSON response from the API.")
